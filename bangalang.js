@@ -56,53 +56,6 @@ var scan = function(text) {
 	};
 }
 
-// The operators helper object is used to resolve how tightly
-// operators bind or what their associativity is.  Only
-// a few operators have predefined precedence that is adjusted
-// so that the syntax seems similar to the C family programming
-// languages.
-var operators = (function() {
-	var NOT_OPERATOR = null;
-	var WORD_OPERATOR = 5;
-	var CUSTOM_OPERATOR = 10;
-
-	function getPrecedence(operator) {
-		if (!operator) return;
-
-		var operators = {
-			"{": NOT_OPERATOR,
-			"(": NOT_OPERATOR,
-			"}": NOT_OPERATOR,
-			")": NOT_OPERATOR,
-			",": NOT_OPERATOR,
-			";": 2,
-			"=": 3,
-			"+": 20,
-			"-": 20,
-			"*": 40,
-			"/": 40
-		};
-
-		if (operator in operators) return operators[operator];
-		// identifiers
-		if (/^[A-Za-z0-9_]/.test(operator)) return WORD_OPERATOR;
-		// new operators
-		return CUSTOM_OPERATOR;
-	}
-
-	function bindsToRight(operator) {
-		return operator === ":";
-	}
-
-	return {
-		getPrecedence: getPrecedence,
-		bindsToRight: bindsToRight,
-		// higher than ; but lower than word operators
-		SMALL_PRECEDENCE: 4,
-		LOW_PRECEDENCE: 0
-	};
-}());
-
 // The parser returns a syntax tree for the given stream of tokens
 var parse = function(tokens, ops) {
 	var currentToken;
@@ -333,20 +286,8 @@ var interpret = function(expression, globals, wrapInvocation, callback) {
 	}, globals, callback);
 };
 
-var code = "2 + 3 * 6";
-var expression = parse(scan(code), operators);
-var globals = {
-	"+" : function(a, b) {
-		console.log("add " + a + " and " + b);
-		return a + b; 
-	},
-	"*" : function(a, b) {
-		console.log("mult " + a + " and " + b); 
-		return a * b 
-	}
+module.exports = {
+	scan: scan,
+	parse: parse,
+	interpret: interpret
 };
-var identity = function(value) { return value };
-
-interpret(expression, globals, identity, function (result) {
-	console.log("result: " + result);
-});
