@@ -113,6 +113,10 @@ var parse = function(tokens, ops) {
 		return identifier;
 	}
 
+	function nextFunctionArguments(func) {
+		return new FuncCall(func, nextArguments());
+	}
+
 	function nextBinaryOperator(precedence, left) {
 		while (true) {
 			var tokenPrec = ops.getPrecedence(currentToken);
